@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <Task Name="PlcTask" Id="{ddb3af37-d577-4fb5-8115-916efef00cae}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>40000</CycleTime>
+    <Priority>20</Priority>
+    <PouCall>
+      <Name>MAIN</Name>
+    </PouCall>
+    <PouCall>
+      <Name>PRG_MQQT</Name>
+    </PouCall>
+    <TaskFBGuid>{f25a0fb3-b65a-4d26-8d23-fe022521c0d3}</TaskFBGuid>
+    <Fb_init>{99d6fa34-75ee-4a5b-b54f-a61335dad0df}</Fb_init>
+    <Fb_exit>{ab1e294c-df37-483d-b051-5f60de7a3fef}</Fb_exit>
+    <CycleUpdate>{0ccf67a3-85e5-4b30-9a28-e924dfd4d7bb}</CycleUpdate>
+    <PostCycleUpdate>{be4f0fa0-b8ee-4964-ace1-684dbff6aaa4}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

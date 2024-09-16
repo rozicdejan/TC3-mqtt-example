@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="PRG_MQQT" Id="{a4679996-b513-4da7-a0fc-1deb2c5ace45}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_MQQT
+VAR
+	fbMqttClient    : FB_IotMqttClient;
+   	bSetParameter   : BOOL;
+    bConnect        : BOOL;
+	(* received message *)
+    bSubscribed    : BOOL;
+    sTopicSub      : STRING(255) := '/encoder/data';
+    {attribute 'TcEncoding':='UTF-8'}
+    sTopicRcv      : STRING(255);
+    {attribute 'TcEncoding':='UTF-8'}
+    sPayloadRcv    : STRING(255);
+    fbMessageQueue : FB_IotMqttMessageQueue;
+    fbMessage      : FB_IotMqttMessage;
+	
+	
+	sTopicPub   : STRING(255) := '/encoder/data';
+
+    fbTimer : TON := (PT:=T#1S);
+ 
+	xFirstRun : BOOL;
+	
+	udiAdsLogRes: DINT;
+	strSFCErrorStep: T_MaxString;
+	sPayloadPub3 : STRING(19500) := '{{"0":{"voltage":2.26,"timestamp":100368454545399533},"1":{"voltage":6.7,"timestamp":539989284586820934},"2":{"voltage":6.38,"timestamp":1661075085973272335},"3":{"voltage":3.54,"timestamp":274757290193708582},"4":{"voltage":8.15,"timestamp":1630176802344582473},"5":{"voltage":4.83,"timestamp":991505336262442024},"6":{"voltage":3.08,"timestamp":1121694764977930136},"7":{"voltage":6.05,"timestamp":3338293648218737},"8":{"voltage":3.77,"timestamp":1483300850892282305},"9":{"voltage":3.78,"timestamp":1542616867428968941},"10":{"voltage":6.07,"timestamp":784674216272844291},"11":{"voltage":1.57,"timestamp":1314304941207065104},"12":{"voltage":3.05,"timestamp":138833588412752689},"13":{"voltage":5.57,"timestamp":1175245042316175575},"14":{"voltage":4.08,"timestamp":163851247304645569},"15":{"voltage":9.45,"timestamp":1638882849961423783},"16":{"voltage":3.92,"timestamp":615711797427170975},"17":{"voltage":8.7,"timestamp":1522616847284519369},"18":{"voltage":5.23,"timestamp":1052819650844649199},"19":{"voltage":2.49,"timestamp":685962515950533581},"20":{"voltage":2.67,"timestamp":763856908396127281},"21":{"voltage":8.26,"timestamp":42802180591467159},"22":{"voltage":7.13,"timestamp":350268452015674493},"23":{"voltage":8.65,"timestamp":514921782667213633},"24":{"voltage":4.75,"timestamp":1513173373259927146},"25":{"voltage":5.38,"timestamp":593930946700359828},"26":{"voltage":1.77,"timestamp":1565758278902670940},"27":{"voltage":2.37,"timestamp":655108830745563537},"28":{"voltage":2.92,"timestamp":755639822510582857},"29":{"voltage":3.15,"timestamp":778830347530546638},"30":{"voltage":0.32,"timestamp":1518409340509080507},"31":{"voltage":1.16,"timestamp":1004640492342127051},"32":{"voltage":4.0,"timestamp":345648517059829972},"33":{"voltage":7.32,"timestamp":174359726976180004},"34":{"voltage":5.03,"timestamp":1083373197403981531},"35":{"voltage":6.45,"timestamp":1604596916372214933},"36":{"voltage":3.39,"timestamp":1041228426348810746},"37":{"voltage":0.12,"timestamp":737632472875238194},"38":{"voltage":2.19,"timestamp":1401890323043351147},"39":{"voltage":8.9,"timestamp":941218388106294922},"40":{"voltage":0.25,"timestamp":1073611164025076760},"41":{"voltage":5.04,"timestamp":1409704176576687054},"42":{"voltage":7.93,"timestamp":1666247699911906144},"43":{"voltage":7.6,"timestamp":943103124081627558},"44":{"voltage":7.53,"timestamp":547874538889887694},"45":{"voltage":3.39,"timestamp":971810554106774896},"46":{"voltage":9.44,"timestamp":626436234026788063},"47":{"voltage":4.36,"timestamp":56858386371214460},"48":{"voltage":4.46,"timestamp":190603592437016110},"49":{"voltage":0.87,"timestamp":933152837874001129},"50":{"voltage":3.09,"timestamp":1638129188105773292},"51":{"voltage":5.02,"timestamp":369050227899107685},"52":{"voltage":6.2,"timestamp":1601765979491161165},"53":{"voltage":9.74,"timestamp":78813562702796512},"54":{"voltage":0.28,"timestamp":1357996725956246619},"55":{"voltage":0.41,"timestamp":1243598155097607448},"56":{"voltage":0.53,"timestamp":1421902488925396934},"57":{"voltage":1.44,"timestamp":1273410104655867075},"58":{"voltage":1.04,"timestamp":1044644640475746414},"59":{"voltage":3.46,"timestamp":740126742041690567},"60":{"voltage":6.32,"timestamp":1535603664367197776},"61":{"voltage":2.13,"timestamp":1608689031952341394},"62":{"voltage":8.62,"timestamp":1554327761454101701},"63":{"voltage":9.68,"timestamp":895649996625345606},"64":{"voltage":1.39,"timestamp":1477325447697716682},"65":{"voltage":7.75,"timestamp":1671535892399829445},"66":{"voltage":3.65,"timestamp":846277625507701942},"67":{"voltage":4.04,"timestamp":588603937457215169},"68":{"voltage":0.2,"timestamp":169142541738711831},"69":{"voltage":6.27,"timestamp":946099537593865160},"70":{"voltage":4.45,"timestamp":681989090677436414},"71":{"voltage":2.16,"timestamp":1081157343702439869},"72":{"voltage":6.16,"timestamp":723775920433020889},"73":{"voltage":6.93,"timestamp":655458830299340752},"74":{"voltage":7.44,"timestamp":338649344964747677},"75":{"voltage":1.48,"timestamp":1116897203120340085},"76":{"voltage":4.21,"timestamp":823178688794479039},"77":{"voltage":4.94,"timestamp":1497570532470836417},"78":{"voltage":6.19,"timestamp":1430275905190642388},"79":{"voltage":3.69,"timestamp":385981281823936648},"80":{"voltage":9.9,"timestamp":874876515662324074},"81":{"voltage":5.88,"timestamp":68601350109122496},"82":{"voltage":7.97,"timestamp":1326555634909981885},"83":{"voltage":6.09,"timestamp":1484587486662174985},"84":{"voltage":3.37,"timestamp":708702744109205396},"85":{"voltage":1.0,"timestamp":310296558078154539},"86":{"voltage":1.35,"timestamp":1214546923438701088},"87":{"voltage":8.18,"timestamp":1365085311418247901},"88":{"voltage":6.24,"timestamp":1169650439698644439},"89":{"voltage":5.38,"timestamp":1133523514977167248},"90":{"voltage":5.67,"timestamp":1192246688404402869},"91":{"voltage":5.69,"timestamp":1083292271855447721},"92":{"voltage":5.04,"timestamp":747000282504256703},"93":{"voltage":4.92,"timestamp":1666721352136165829},"94":{"voltage":9.51,"timestamp":40205110896683465},"95":{"voltage":1.5,"timestamp":523541917386161574},"96":{"voltage":8.1,"timestamp":659337059061722650},"97":{"voltage":5.59,"timestamp":1152717815502593562},"98":{"voltage":1.39,"timestamp":523678939004484768},"99":{"voltage":8.91,"timestamp":1201712323794007776},"100":{"voltage":1.41,"timestamp":1152559239437870691},"101":{"voltage":9.26,"timestamp":774533936946284363},"102":{"voltage":9.04,"timestamp":1319704672446053696},"103":{"voltage":5.99,"timestamp":1336835344254001431},"104":{"voltage":7.43,"timestamp":1634412375669206772},"105":{"voltage":1.71,"timestamp":1353881028916692243},"106":{"voltage":9.16,"timestamp":699563910014510868},"107":{"voltage":0.92,"timestamp":334695414953173828},"108":{"voltage":3.36,"timestamp":488615906196616776},"109":{"voltage":0.25,"timestamp":1573725408154100675},"110":{"voltage":9.47,"timestamp":901376694063132616},"111":{"voltage":9.95,"timestamp":1546928442181538078},"112":{"voltage":8.44,"timestamp":1175322699380780119},"113":{"voltage":1.33,"timestamp":1383903782757051081},"114":{"voltage":6.02,"timestamp":798933737872338725},"115":{"voltage":6.55,"timestamp":1408619196838989999},"116":{"voltage":4.12,"timestamp":117413103485470066},"117":{"voltage":3.59,"timestamp":518165959664995942},"118":{"voltage":7.33,"timestamp":1649439394360872089},"119":{"voltage":8.07,"timestamp":567148074733033434},"120":{"voltage":4.3,"timestamp":393589843591590404},"121":{"voltage":9.51,"timestamp":796983990161548209},"122":{"voltage":3.14,"timestamp":750727884974070849},"123":{"voltage":9.51,"timestamp":176055252141829224},"124":{"voltage":9.98,"timestamp":857608438624580226},"125":{"voltage":0.22,"timestamp":1469966565606546720},"126":{"voltage":0.6,"timestamp":1210828425209377428},"127":{"voltage":5.31,"timestamp":1687707699830287973},"128":{"voltage":4.66,"timestamp":1465614688717939842},"129":{"voltage":4.0,"timestamp":1661270228799901781},"130":{"voltage":3.19,"timestamp":880634071138260766},"131":{"voltage":6.15,"timestamp":1085535420513499986},"132":{"voltage":7.96,"timestamp":412557141100013748},"133":{"voltage":4.3,"timestamp":339824962938369400},"134":{"voltage":0.87,"timestamp":947914979434764366},"135":{"voltage":6.17,"timestamp":1025675345749995389},"136":{"voltage":4.71,"timestamp":532972957072866349},"137":{"voltage":6.81,"timestamp":257611987816453092},"138":{"voltage":4.94,"timestamp":1107646600035349906},"139":{"voltage":9.48,"timestamp":312737153910395356},"140":{"voltage":0.65,"timestamp":49018023814941086},"141":{"voltage":9.16,"timestamp":545898321793691847},"142":{"voltage":6.95,"timestamp":73077854362465432},"143":{"voltage":3.08,"timestamp":1285985709695286052},"144":{"voltage":2.59,"timestamp":1604395310669002039},"145":{"voltage":3.58,"timestamp":772619335115906420},"146":{"voltage":8.51,"timestamp":769394701787635586},"147":{"voltage":1.47,"timestamp":1389309585287693366},"148":{"voltage":5.88,"timestamp":725536569454552649},"149":{"voltage":4.24,"timestamp":1186234459877094101},"150":{"voltage":8.79,"timestamp":1633523065745374089},"151":{"voltage":4.45,"timestamp":41388139667594967},"152":{"voltage":9.04,"timestamp":378524325635512251},"153":{"voltage":9.29,"timestamp":1481666949164218069},"154":{"voltage":1.73,"timestamp":1421984095673625352},"155":{"voltage":6.1,"timestamp":1352494551021778721},"156":{"voltage":6.63,"timestamp":585889087467461764},"157":{"voltage":0.96,"timestamp":1307099469752462889},"158":{"voltage":2.17,"timestamp":702862901345309419},"159":{"voltage":3.09,"timestamp":281674557810949971},"160":{"voltage":1.9,"timestamp":480244284424011396},"161":{"voltage":6.08,"timestamp":1465602639139880345},"162":{"voltage":4.07,"timestamp":21574680018472490},"163":{"voltage":9.94,"timestamp":1545587638542964986},"164":{"voltage":1.94,"timestamp":1503704319955060795},"165":{"voltage":9.69,"timestamp":429378745499207654},"166":{"voltage":1.89,"timestamp":125805214930540904},"167":{"voltage":1.81,"timestamp":267105662274004287},"168":{"voltage":0.48,"timestamp":1037320243979182519},"169":{"voltage":6.69,"timestamp":1688236125835351438},"170":{"voltage":9.89,"timestamp":540409748139650974},"171":{"voltage":4.43,"timestamp":1201118567270459925},"172":{"voltage":2.44,"timestamp":11303577061148016},"173":{"voltage":2.52,"timestamp":964048157871208719},"174":{"voltage":5.77,"timestamp":756442055625455399},"175":{"voltage":1.98,"timestamp":1553658207753445245},"176":{"voltage":9.61,"timestamp":1634952756790890726},"177":{"voltage":0.33,"timestamp":253128332568541810},"178":{"voltage":6.75,"timestamp":207997181480470259},"179":{"voltage":0.65,"timestamp":392219288223033173},"180":{"voltage":2.32,"timestamp":1425579070852397910},"181":{"voltage":6.91,"timestamp":1330816524878712754},"182":{"voltage":3.13,"timestamp":524450425454872819},"183":{"voltage":8.32,"timestamp":1246215925580133004},"184":{"voltage":8.92,"timestamp":282428424141741158},"185":{"voltage":6.72,"timestamp":382926568296040252},"186":{"voltage":7.77,"timestamp":1350483671809592152},"187":{"voltage":9.4,"timestamp":167629838359202510},"188":{"voltage":2.5,"timestamp":336760862319602697},"189":{"voltage":5.4,"timestamp":376562761718325634},"190":{"voltage":9.15,"timestamp":930997345346123015},"191":{"voltage":9.16,"timestamp":224178965014503354},"192":{"voltage":0.22,"timestamp":863393318528656373},"193":{"voltage":8.98,"timestamp":348447470178466955},"194":{"voltage":3.65,"timestamp":801738786075944005},"195":{"voltage":3.41,"timestamp":402664143172485970},"196":{"voltage":9.23,"timestamp":1494317290225833145},"197":{"voltage":2.94,"timestamp":1273580348422359761},"198":{"voltage":9.31,"timestamp":504953384074789592},"199":{"voltage":1.86,"timestamp":950843249398278377},"200":{"voltage":1.2,"timestamp":1521704555645368},"201":{"voltage":9.65,"timestamp":738326437794178335},"202":{"voltage":6.19,"timestamp":499714864600617865},"203":{"voltage":7.02,"timestamp":1234013670746222433},"204":{"voltage":6.93,"timestamp":938715176345416992},"205":{"voltage":5.95,"timestamp":484264534923530463},"206":{"voltage":0.15,"timestamp":1384567053514840054},"207":{"voltage":4.64,"timestamp":1525609184548943060},"208":{"voltage":8.13,"timestamp":412224679927430415},"209":{"voltage":8.85,"timestamp":1065338170809669111},"210":{"voltage":2.28,"timestamp":1210144979674368316},"211":{"voltage":6.3,"timestamp":554286445580015787},"212":{"voltage":2.01,"timestamp":768188762615927203},"213":{"voltage":8.04,"timestamp":1344032733601809832},"214":{"voltage":5.99,"timestamp":54461555359423782},"215":{"voltage":2.61,"timestamp":1492633707292256063},"216":{"voltage":0.56,"timestamp":92245199989563071},"217":{"voltage":1.93,"timestamp":196506732182047130},"218":{"voltage":9.13,"timestamp":435426628092276794},"219":{"voltage":0.36,"timestamp":1355895826796223232},"220":{"voltage":5.34,"timestamp":378483240504520062},"221":{"voltage":0.68,"timestamp":1540298337742841625},"222":{"voltage":2.9,"timestamp":678976408981499623},"223":{"voltage":8.63,"timestamp":147074597248627161},"224":{"voltage":6.98,"timestamp":1673982851645979874},"225":{"voltage":4.22,"timestamp":309606162204225836},"226":{"voltage":8.95,"timestamp":187169855655608261},"227":{"voltage":4.47,"timestamp":1172346266265256174},"228":{"voltage":7.33,"timestamp":807374708384636023},"229":{"voltage":5.42,"timestamp":1516978922658938631},"230":{"voltage":0.87,"timestamp":1433189275739083364},"231":{"voltage":4.22,"timestamp":1671520006391171537},"232":{"voltage":7.27,"timestamp":1263813369432825584},"233":{"voltage":6.98,"timestamp":642659891378499610},"234":{"voltage":8.93,"timestamp":1647160534772016439},"235":{"voltage":4.07,"timestamp":1337891602478688148},"236":{"voltage":1.11,"timestamp":1330505240091155498},"237":{"voltage":4.82,"timestamp":1493185229137657416},"238":{"voltage":7.82,"timestamp":221905401561777392},"239":{"voltage":6.5,"timestamp":1418015841731849750},"240":{"voltage":5.11,"timestamp":240629747852874138},"241":{"voltage":3.99,"timestamp":1326732512906264775},"242":{"voltage":9.19,"timestamp":1278466682230146268},"243":{"voltage":5.18,"timestamp":864032795749154135},"244":{"voltage":8.87,"timestamp":1703643958042259696},"245":{"voltage":1.66,"timestamp":1144618978320573046},"246":{"voltage":5.01,"timestamp":1106634423121484063},"247":{"voltage":1.34,"timestamp":320768715808815665},"248":{"voltage":7.18,"timestamp":436271508627258217},"249":{"voltage":9.28,"timestamp":140024278178339219},"250":{"voltage":3.83,"timestamp":1550762145828660484},"251":{"voltage":9.53,"timestamp":1385178104808787901},"252":{"voltage":5.72,"timestamp":640260706989099569},"253":{"voltage":9.18,"timestamp":1664071448858530410},"254":{"voltage":7.15,"timestamp":1621677383029507799},"255":{"voltage":9.32,"timestamp":775521893488889689},"256":{"voltage":3.34,"timestamp":1157629943014277563},"257":{"voltage":5.69,"timestamp":1372807368557565037},"258":{"voltage":3.46,"timestamp":930045028614636884},"259":{"voltage":7.8,"timestamp":1647012525275257830},"260":{"voltage":4.43,"timestamp":1324256581334839489},"261":{"voltage":3.56,"timestamp":540390071099832564},"262":{"voltage":6.08,"timestamp":590260979486435967},"263":{"voltage":7.71,"timestamp":118114199149880622},"264":{"voltage":8.58,"timestamp":1651114220669192702},"265":{"voltage":5.48,"timestamp":1609301554730433125},"266":{"voltage":8.11,"timestamp":389040056740629882},"267":{"voltage":8.03,"timestamp":1383126710174158047},"268":{"voltage":9.29,"timestamp":470769563731443130},"269":{"voltage":8.6,"timestamp":495300102668862420},"270":{"voltage":3.15,"timestamp":1190171051330425809},"271":{"voltage":1.25,"timestamp":840277501667650914},"272":{"voltage":0.22,"timestamp":434964381415134912},"273":{"voltage":6.86,"timestamp":385429942241109699},"274":{"voltage":4.97,"timestamp":1340143387508200867},"275":{"voltage":6.84,"timestamp":346511783578092509},"276":{"voltage":0.57,"timestamp":385541171888235720},"277":{"voltage":3.07,"timestamp":1567523970658946639},"278":{"voltage":8.42,"timestamp":997341838372453553},"279":{"voltage":3.97,"timestamp":1358226078319886770},"280":{"voltage":1.82,"timestamp":1534680107927456989},"281":{"voltage":2.77,"timestamp":217575202799007839},"282":{"voltage":0.06,"timestamp":1358203371248393087},"283":{"voltage":8.27,"timestamp":1449372164794274525},"284":{"voltage":8.54,"timestamp":847877433061701684},"285":{"voltage":3.31,"timestamp":20299652051264195},"286":{"voltage":8.96,"timestamp":1257144632073401621},"287":{"voltage":9.95,"timestamp":1136071073260623296},"288":{"voltage":1.7,"timestamp":1028480701983850647},"289":{"voltage":1.61,"timestamp":111977742733655391},"290":{"voltage":2.53,"timestamp":996575835076961742},"291":{"voltage":7.84,"timestamp":1122066305939746651},"292":{"voltage":7.23,"timestamp":602449153346858454},"293":{"voltage":9.93,"timestamp":1063765066958125291},"294":{"voltage":5.95,"timestamp":550284247705559498},"295":{"voltage":0.13,"timestamp":420184290492992679},"296":{"voltage":0.12,"timestamp":1640095326915021015},"297":{"voltage":8.05,"timestamp":917201975503070735},"298":{"voltage":2.01,"timestamp":1433836035271238552},"299":{"voltage":4.75,"timestamp":1610139298884275426},"300":{"voltage":9.02,"timestamp":536440661461053185},"301":{"voltage":4.37,"timestamp":1121040728982992536},"302":{"voltage":1.41,"timestamp":1188272844292307155},"303":{"voltage":9.33,"timestamp":569193359759902564},"304":{"voltage":8.97,"timestamp":988594426971038316},"305":{"voltage":4.83,"timestamp":1072317691099831909},"306":{"voltage":0.51,"timestamp":1222807772086040137},"307":{"voltage":8.92,"timestamp":742596882647506460},"308":{"voltage":5.44,"timestamp":1311467547209170241},"309":{"voltage":3.99,"timestamp":1561448241612947585},"310":{"voltage":4.08,"timestamp":895560083603383536},"311":{"voltage":9.36,"timestamp":284079848801549325},"312":{"voltage":1.67,"timestamp":332618907673895074},"313":{"voltage":4.37,"timestamp":588879238976983581},"314":{"voltage":1.29,"timestamp":1214349675614311306},"315":{"voltage":6.91,"timestamp":550236570626546079},"316":{"voltage":7.41,"timestamp":1400915427633817227},"317":{"voltage":6.68,"timestamp":847606664545637966},"318":{"voltage":5.35,"timestamp":83951749129566267},"319":{"voltage":1.2,"timestamp":903430114888639000},"320":{"voltage":2.12,"timestamp":479372570290225223},"321":{"voltage":8.79,"timestamp":443748124485613400},"322":{"voltage":6.86,"timestamp":1338313827325361757},"323":{"voltage":0.07,"timestamp":393823566316788520},"324":{"voltage":4.11,"timestamp":159649944935123505},"325":{"voltage":9.6,"timestamp":106038631634369178},"326":{"voltage":9.08,"timestamp":1123906489624953631},"327":{"voltage":9.87,"timestamp":407234266613152300},"328":{"voltage":4.34,"timestamp":232558910473210528},"329":{"voltage":5.39,"timestamp":1005371303952470865},"330":{"voltage":0.67,"timestamp":1021910015392020551},"331":{"voltage":5.09,"timestamp":946671293987673562},"332":{"voltage":1.21,"timestamp":1079336922609961391},"333":{"voltage":0.93,"timestamp":678192466178945323},"334":{"voltage":2.98,"timestamp":827984469416732939},"335":{"voltage":1.09,"timestamp":120438921149172549},"336":{"voltage":7.6,"timestamp":640434804758252939},"337":{"voltage":1.66,"timestamp":8656893348254949},"338":{"voltage":6.54,"timestamp":1567221242639288556},"339":{"voltage":5.97,"timestamp":559804352114037848},"340":{"voltage":3.23,"timestamp":906606437088225856},"341":{"voltage":0.29,"timestamp":1575479372906832136},"342":{"voltage":0.36,"timestamp":662201677797274685},"343":{"voltage":7.0,"timestamp":67910350819141180},"344":{"voltage":3.5,"timestamp":1538822462794548085},"345":{"voltage":1.53,"timestamp":362949629972595835},"346":{"voltage":7.43,"timestamp":252936131122288564},"347":{"voltage":7.34,"timestamp":992816767250580449},"348":{"voltage":2.49,"timestamp":1071234322365985961},"349":{"voltage":1.15,"timestamp":1600770080078785246},"350":{"voltage":6.97,"timestamp":840239702520718081},"351":{"voltage":2.12,"timestamp":1699809875541471727},"352":{"voltage":4.58,"timestamp":203569171431473810},"353":{"voltage":2.26,"timestamp":794358660185621329},"354":{"voltage":8.27,"timestamp":1718399588320254195},"355":{"voltage":7.31,"timestamp":271722201391786004},"356":{"voltage":8.03,"timestamp":367248606692744381},"357":{"voltage":1.66,"timestamp":574400648493105961},"358":{"voltage":4.51,"timestamp":603699589044701592},"359":{"voltage":5.02,"timestamp":261491953914535637}}}';
+	pChar : POINTER TO BYTE;       // Pointer to manipulate the string buffer
+                    // Loop counter and string length tracker
+    sNumber : STRING(5);           // Temporary string to hold each number
+    pBaseAddr : POINTER TO BYTE;   // Pointer to the base address of the string
+	counter : int;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+fbMqttClient.Execute(bConnect AND xFirstRun);
+
+
+IF NOT xFirstRun THEN
+	//set parameters
+	fbMqttClient.sHostName      := '192.168.33.1';
+    fbMqttClient.nHostPort      := 1883;
+    fbMqttClient.ipMessageQueue := fbMessageQueue;
+	fbMqttClient.sClientId		:= 'MytxtClient';
+	bSetParameter               := FALSE;
+	
+	xFirstRun := TRUE;
+END_IF
+
+IF bSetParameter THEN
+    
+    fbMqttClient.sHostName      := '192.168.33.1';
+    fbMqttClient.nHostPort      := 1883;
+    fbMqttClient.ipMessageQueue := fbMessageQueue;
+	fbMqttClient.sClientId		:= 'MytxtClient';
+	bSetParameter               := FALSE;
+ELSE
+	bConnect := TRUE;
+END_IF
+
+
+
+
+IF fbMqttClient.bConnected THEN
+    IF NOT bSubscribed THEN
+        bSubscribed := fbMqttClient.Subscribe(sTopic:=sTopicSub, eQoS:=TcIotMqttQos.AtMostOnceDelivery);
+    END_IF
+    fbTimer(IN:=TRUE);
+	
+
+		    IF fbTimer.Q THEN // publish new payload every second
+				fbTimer(IN:=FALSE);        
+				fbMqttClient.Publish(sTopic:= sTopicPub,
+									pPayload:= ADR(sPayloadPub3), nPayloadSize:= LEN2(ADR(sPayloadPub3))+1,
+									eQoS:= TcIotMqttQos.AtMostOnceDelivery,
+									bRetain:= FALSE,
+									bQueue:= FALSE );
+				fbMqttClient.Publish(sTopic:= sTopicPub,
+									pPayload:= ADR(sPayloadPub3), nPayloadSize:= LEN2(ADR(sPayloadPub3))+1,
+									eQoS:= TcIotMqttQos.AtMostOnceDelivery,
+									bRetain:= FALSE,
+									bQueue:= FALSE );
+				fbMqttClient.Publish(sTopic:= sTopicPub,
+									pPayload:= ADR(sPayloadPub3), nPayloadSize:= LEN2(ADR(sPayloadPub3))+1,
+									eQoS:= TcIotMqttQos.AtMostOnceDelivery,
+									bRetain:= FALSE,
+									bQueue:= FALSE );
+				fbMqttClient.Publish(sTopic:= sTopicPub,
+									pPayload:= ADR(sPayloadPub3), nPayloadSize:= LEN2(ADR(sPayloadPub3))+1,
+									eQoS:= TcIotMqttQos.AtMostOnceDelivery,
+									bRetain:= FALSE,
+									bQueue:= FALSE );
+									
+				fbMqttClient.Publish(sTopic:= sTopicPub,
+									pPayload:= ADR(sPayloadPub3), nPayloadSize:= LEN2(ADR(sPayloadPub3))+1,
+									eQoS:= TcIotMqttQos.AtMostOnceDelivery,
+									bRetain:= FALSE,
+									bQueue:= FALSE );
+    	END_IF
+
+
+	
+END_IF]]></ST>
+    </Implementation>
+    <Method Name="METH_CalculateArray" Id="{dac3072f-82d9-4952-9e69-5aeca520ac7a}">
+      <Declaration><![CDATA[METHOD METH_CalculateArray : BOOL
+VAR_INPUT
+END_VAR
+VAR
+	pChar : POINTER TO BYTE;       // Pointer to manipulate the string buffer
+    sPayloadPub : STRING(200);     // Adjust size as needed (must be large enough)
+    i, len : INT;                  // Loop counter and length of temporary number string
+    sNumber : STRING(1000) := '{0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359}';           // Temporary string to hold each number
+    pBaseAddr : POINTER TO BYTE;   // Pointer to the base address of the string
+	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Initialize the payload string with the opening curly brace
+sPayloadPub := '{';
+
+// Get the base address of the string buffer
+pBaseAddr := ADR(sPayloadPub);
+
+// Calculate the current length of the string to know where to start
+len := 200;
+pChar := pBaseAddr + len;  // Move the pointer to the end of the current string
+
+// Loop through numbers from 0 to 100
+
+
+    // Copy the characters of sNumber directly into the sPayloadPub buffer using the pointer
+    
+    // Add a space after each number except the last one
+  
+
+// Add the closing curly brace
+pChar^ := 125;
+pChar := pChar + 1;
+
+// Terminate the string with NULL (TwinCAT expects strings to end with a NULL character)
+pChar^ := 0;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="PRG_MQQT">
+      <LineId Id="93" Count="2" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="108" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="116" Count="3" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="20" Count="4" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="91" Count="1" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="295" Count="2" />
+      <LineId Id="299" Count="1" />
+      <LineId Id="342" Count="0" />
+      <LineId Id="344" Count="0" />
+      <LineId Id="347" Count="6" />
+      <LineId Id="355" Count="3" />
+      <LineId Id="354" Count="0" />
+      <LineId Id="360" Count="3" />
+      <LineId Id="359" Count="0" />
+      <LineId Id="365" Count="3" />
+      <LineId Id="364" Count="0" />
+      <LineId Id="369" Count="0" />
+      <LineId Id="371" Count="3" />
+      <LineId Id="370" Count="0" />
+      <LineId Id="345" Count="1" />
+      <LineId Id="308" Count="0" />
+      <LineId Id="343" Count="0" />
+      <LineId Id="49" Count="0" />
+    </LineIds>
+    <LineIds Name="PRG_MQQT.METH_CalculateArray">
+      <LineId Id="6" Count="9" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="52" Count="2" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="32" Count="8" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
