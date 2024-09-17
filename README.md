@@ -6,7 +6,7 @@ This project implements a communication system between a Beckhoff PLC and an MQT
 
 ## Features
 
-- **Data Transmission**: Sends five data points (angle, voltage, current, and timestamp) every second.
+- **Data Transmission**: Sends five data points (angle, voltage, and timestamp) every second.
 - **MQTT Protocol**: Uses MQTT for communication between the PLC and the broker.
 - **Real-Time Monitoring**: Data is transmitted continuously, allowing for real-time monitoring and analysis.
   
